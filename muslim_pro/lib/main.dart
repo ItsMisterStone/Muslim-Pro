@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'screens/prayer_times_screen.dart';
 import 'screens/morning_athkar_screen.dart';
+import 'screens/qibla_screen.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -86,6 +88,30 @@ class DashboardScreen extends StatelessWidget {
                 ),
               ),
             ),
+
+            const SizedBox(height: 20),
+
+            // --- Qibla Direction Button ---
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const QiblaScreen()),
+                );
+              },
+              icon: const Icon(Icons.compass_calibration, size: 28),
+              label: const Text(
+                'Qibla Direction',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                backgroundColor: const Color.fromARGB(255, 130, 215, 154),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+              ),
+            )
           ],
         ),
       ),
