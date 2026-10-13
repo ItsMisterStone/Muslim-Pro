@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screens/prayer_times_screen.dart';
-import 'screens/morning_athkar_screen.dart';
-
+import 'screens/athkar_selection_screen.dart';
 void main() {
   runApp(const MyApp());
 }
@@ -18,13 +17,13 @@ class MyApp extends StatelessWidget {
         colorSchemeSeed: Colors.green,
         useMaterial3: true,
       ),
-      // Set the home to our new DashboardScreen
+      
       home: const DashboardScreen(), 
     );
   }
 }
 
-// A new Dashboard screen acting as your "Front Page"
+
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
 
@@ -40,7 +39,7 @@ class DashboardScreen extends StatelessWidget {
         padding: const EdgeInsets.all(20.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch, // Makes buttons fill the width
+          crossAxisAlignment: CrossAxisAlignment.stretch, 
           children: [
             // --- Prayer Times Button ---
             ElevatedButton.icon(
@@ -62,25 +61,25 @@ class DashboardScreen extends StatelessWidget {
                 ),
               ),
             ),
+            const SizedBox(height: 20),
             
-            const SizedBox(height: 20), // Spacing between buttons
-            
-            // --- Morning Zikr Button ---
+            // --- Combined Daily Zikr Button ---
             ElevatedButton.icon(
               onPressed: () {
+                // Navigates to our new selection screen
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const MorningAthkarScreen()),
+                  MaterialPageRoute(builder: (context) => const AthkarSelectionScreen()),
                 );
               },
-              icon: const Icon(Icons.wb_sunny_outlined, size: 28),
+              icon: const Icon(Icons.menu_book, size: 28),
               label: const Text(
-                'Morning Zikr',
+                'Daily Zikr',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 20),
-                backgroundColor: Colors.teal.shade50, // Optional: slightly different color
+                backgroundColor: Colors.teal.shade50,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15),
                 ),
