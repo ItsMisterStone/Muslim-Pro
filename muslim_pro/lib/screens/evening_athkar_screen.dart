@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/athkar_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class EveningAthkarScreen extends StatefulWidget {
   const EveningAthkarScreen({Key? key}) : super(key: key);
@@ -103,22 +104,67 @@ Do not leave me to my soul for so much as a the blink of an eye.''',
     ), 
 
   ];
+   static const String _dateKey = 'evening_athkar_date';
 
+String _countKey(String id) => 'evening_athkar_count_$id';
+
+String _todayString() {
+  final now = DateTime.now();
+  return '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+}
+
+@override
+void initState() {
+  super.initState();
+  _loadProgress();
+}
+
+Future<void> _loadProgress() async {
+  final prefs = await SharedPreferences.getInstance();
+  final today = _todayString();
+
+  // New day: clear yesterday's counts and start fresh
+  if (prefs.getString(_dateKey) != today) {
+    for (final item in _eveningAthkarList) {
+      await prefs.remove(_countKey(item.id));
+    }
+    await prefs.setString(_dateKey, today);
+    return;
+  }
+
+  // Same day: restore saved counts
+  if (!mounted) return;
+  setState(() {
+    for (final item in _eveningAthkarList) {
+      item.currentCount = prefs.getInt(_countKey(item.id)) ?? 0;
+    }
+  });
+}
+
+Future<void> _saveProgress() async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setString(_dateKey, _todayString());
+  for (final item in _eveningAthkarList) {
+    await prefs.setInt(_countKey(item.id), item.currentCount);
+  }
+}
   void _incrementCounter(int index) {
-    setState(() {
-      if (_eveningAthkarList[index].currentCount < _eveningAthkarList[index].targetCount) {
-        _eveningAthkarList[index].currentCount++;
-      }
-    });
-  }
+  setState(() {
+    if (_eveningAthkarList[index].currentCount < _eveningAthkarList[index].targetCount) {
+      _eveningAthkarList[index].currentCount++;
+    }
+  });
+  _saveProgress();
+}
 
-  void _resetCounters() {
-    setState(() {
-      for (var item in _eveningAthkarList) {
-        item.currentCount = 0;
-      }
-    });
-  }
+void _resetCounters() {
+  setState(() {
+    for (var item in _eveningAthkarList) {
+      item.currentCount = 0;
+    }
+  });
+  _saveProgress();
+}
 
   @override
   Widget build(BuildContext context) {
