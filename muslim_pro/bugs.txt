@@ -1,0 +1,4 @@
+2. User needs to be able to choose their preferred prayer timings
+3. User should get notifications
+4. User should be able to choose their preferred reciter
+5. Improve the qibla text
