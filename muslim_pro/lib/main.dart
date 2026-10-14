@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screens/prayer_times_screen.dart';
-import 'screens/morning_athkar_screen.dart';
+import 'screens/athkar_selection_screen.dart';
 import 'screens/qibla_screen.dart';
 import 'screens/quran_screen.dart';
 
@@ -68,18 +68,18 @@ class DashboardScreen extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // --- Morning Zikr Button ---
+            // --- Combined Daily Zikr Button (Morning + Evening) ---
             ElevatedButton.icon(
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const MorningAthkarScreen()),
+                      builder: (context) => const AthkarSelectionScreen()),
                 );
               },
-              icon: const Icon(Icons.wb_sunny_outlined, size: 28),
+              icon: const Icon(Icons.wb_twilight, size: 28),
               label: const Text(
-                'Morning Zikr',
+                'Daily Zikr',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               style: ElevatedButton.styleFrom(
