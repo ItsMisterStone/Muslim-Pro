@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'screens/prayer_times_screen.dart';
-import 'screens/athkar_selection_screen.dart';
+import 'screens/morning_athkar_screen.dart';
 import 'screens/qibla_screen.dart';
-void main() {
+import 'screens/quran_screen.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -18,13 +21,12 @@ class MyApp extends StatelessWidget {
         colorSchemeSeed: Colors.green,
         useMaterial3: true,
       ),
-      
-      home: const DashboardScreen(), 
+      home: const DashboardScreen(),
     );
   }
 }
 
-
+// Dashboard screen acting as the "Front Page"
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
 
@@ -40,14 +42,15 @@ class DashboardScreen extends StatelessWidget {
         padding: const EdgeInsets.all(20.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch, 
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // --- Prayer Times Button ---
             ElevatedButton.icon(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const PrayerTimesScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => const PrayerTimesScreen()),
                 );
               },
               icon: const Icon(Icons.access_time, size: 28),
@@ -62,20 +65,21 @@ class DashboardScreen extends StatelessWidget {
                 ),
               ),
             ),
+
             const SizedBox(height: 20),
-            
-            // --- Combined Daily Zikr Button ---
+
+            // --- Morning Zikr Button ---
             ElevatedButton.icon(
               onPressed: () {
-                // Navigates to our new selection screen
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const AthkarSelectionScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => const MorningAthkarScreen()),
                 );
               },
-              icon: const Icon(Icons.menu_book, size: 28),
+              icon: const Icon(Icons.wb_sunny_outlined, size: 28),
               label: const Text(
-                'Daily Zikr',
+                'Morning Zikr',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               style: ElevatedButton.styleFrom(
@@ -109,7 +113,31 @@ class DashboardScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(15),
                 ),
               ),
-            )
+            ),
+
+            const SizedBox(height: 20),
+
+            // --- Quran Button ---
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const QuranScreen()),
+                );
+              },
+              icon: const Icon(Icons.menu_book, size: 28),
+              label: const Text(
+                'Quran',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                backgroundColor: Colors.lightGreen.shade100,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+              ),
+            ),
           ],
         ),
       ),
