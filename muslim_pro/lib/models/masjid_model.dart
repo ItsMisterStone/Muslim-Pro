@@ -3,14 +3,14 @@ class Masjid {
   final String name;
   final String area;
 
-  // Minutes after Waqt starts when this specific Masjid calls Adhan
+  // Waqt starts when this specific Masjid calls Adhan
   final int fajrAdhanOffset;
   final int dhuhrAdhanOffset;
   final int asrAdhanOffset;
   final int maghribAdhanOffset;
   final int ishaAdhanOffset;
 
-  // Minutes after this Masjid's Adhan when Jamaat starts
+  // Masjid's Adhan when Jamaat starts
   final int fajrJamaatDelay;
   final int dhuhrJamaatDelay;
   final int asrJamaatDelay;
@@ -33,7 +33,7 @@ class Masjid {
     required this.ishaJamaatDelay,
   });
 
-  // Helper to get Adhan time for a specific prayer at this Masjid
+  // Adhan time for a specific prayer at this Masjid
   DateTime getAdhanTime(String prayer, DateTime baseWaqtTime) {
     switch (prayer) {
       case 'Fajr':
@@ -51,7 +51,7 @@ class Masjid {
     }
   }
 
-  // Helper to get Jamaat time for a specific prayer at this Masjid
+  // Jamaat time for a specific prayer at this Masjid
   DateTime getJamaatTime(String prayer, DateTime baseWaqtTime) {
     final adhanTime = getAdhanTime(prayer, baseWaqtTime);
     switch (prayer) {

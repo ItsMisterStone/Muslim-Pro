@@ -144,7 +144,7 @@ class _MasjidTimingsScreenState extends State<MasjidTimingsScreen> {
       )
           : Column(
         children: [
-          // 1. Search Bar to look for a Masjid
+          // Search Bar to look for a Masjid
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: TextField(
@@ -161,7 +161,7 @@ class _MasjidTimingsScreenState extends State<MasjidTimingsScreen> {
             ),
           ),
 
-          // 2. Horizontal Masjid Selector Chips
+          // Masjid Selector
           SizedBox(
             height: 60,
             child: _filteredMasjids.isEmpty
@@ -189,7 +189,7 @@ class _MasjidTimingsScreenState extends State<MasjidTimingsScreen> {
             ),
           ),
 
-          // 3. Selected Masjid Header
+          // selected Masjid Header
           if (_selectedMasjid != null)
             Container(
               width: double.infinity,
@@ -311,7 +311,7 @@ class _MasjidTimingsScreenState extends State<MasjidTimingsScreen> {
                 ),
                 const SizedBox(height: 6),
 
-                // Jamaat Time Row
+                // Jamaat Time
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(

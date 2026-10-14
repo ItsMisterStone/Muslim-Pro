@@ -31,7 +31,7 @@ class MasjidQueries {
       await db.rawQuery('SELECT COUNT(*) FROM $tableName'),
     );
 
-    // Seed default masjids if the table is empty
+    // default masjids if the table is empty
     if (count == 0) {
       final sampleMasjids = [
         Masjid(
