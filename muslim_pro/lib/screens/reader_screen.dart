@@ -31,6 +31,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
   bool _loading = true;
   bool _downloaded = false;
   bool _isPlaying = false;
+  bool _inBismillah = false; // true while the bismillah audio is playing
   int? _playingAyah; // ayah number currently loaded in the player
   int _topIndex = 0;
 
@@ -48,7 +49,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
     _audio.progressOf(widget.surah.number).addListener(_onDownloadChanged);
 
     _stateSub = _player.processingStateStream.listen((state) {
-      if (state == ProcessingState.completed) _onAyahFinished();
+      if (state == ProcessingState.completed) _onAudioFinished();
     });
     _playingSub = _player.playingStream.listen((playing) {
       if (mounted) setState(() => _isPlaying = playing);
@@ -117,35 +118,52 @@ class _ReaderScreenState extends State<ReaderScreen> {
     return n.clamp(1, _ayahs.length);
   }
 
-  Future<void> _playAyah(int ayahNumber) async {
+  /// Plays an ayah. For ayah 1 of surahs that need it, the bismillah audio
+  /// plays first, then _onAudioFinished moves on to the ayah itself.
+  Future<void> _playAyah(int ayahNumber, {bool withBismillah = true}) async {
     if (!_downloaded) {
       _snack("Download this surah's audio first to listen.");
       return;
     }
     if (ayahNumber < 1 || ayahNumber > _ayahs.length) return;
 
-    final file = await _audio.ayahFile(widget.surah.number, ayahNumber);
+    final playBismillah =
+        withBismillah && ayahNumber == 1 && _showBismillahHeader;
+    final file = playBismillah
+        ? await _audio.bismillahFile()
+        : await _audio.ayahFile(widget.surah.number, ayahNumber);
+
     if (!await file.exists()) {
       _snack('Audio file missing. Delete and download the audio again.');
       return;
     }
     if (!mounted) return;
 
-    setState(() => _playingAyah = ayahNumber);
-    _scrollToAyah(ayahNumber);
+    setState(() {
+      _playingAyah = ayahNumber;
+      _inBismillah = playBismillah;
+    });
+    _scrollToIndex(playBismillah ? 0 : ayahNumber - 1 + _headerCount);
 
     try {
       await _player.setFilePath(file.path);
       _player.play();
     } catch (e) {
       if (e is PlayerInterruptedException) return; // user skipped quickly
-      if (mounted) _snack('Could not play this ayah.');
+      _snack('Could not play this ayah.');
     }
   }
 
-  void _onAyahFinished() {
+  void _onAudioFinished() {
     final current = _playingAyah;
     if (current == null) return;
+
+    // Bismillah just ended: now play ayah 1 itself.
+    if (_inBismillah) {
+      _playAyah(1, withBismillah: false);
+      return;
+    }
+
     if (current < _ayahs.length) {
       _playAyah(current + 1);
     } else {
@@ -154,6 +172,7 @@ class _ReaderScreenState extends State<ReaderScreen> {
       if (mounted) {
         setState(() {
           _playingAyah = null;
+          _inBismillah = false;
           _isPlaying = false;
         });
       }
@@ -185,14 +204,15 @@ class _ReaderScreenState extends State<ReaderScreen> {
     if (!mounted) return;
     setState(() {
       _playingAyah = null;
+      _inBismillah = false;
       _isPlaying = false;
     });
   }
 
-  void _scrollToAyah(int ayahNumber) {
+  void _scrollToIndex(int index) {
     if (!_scrollController.isAttached) return;
     _scrollController.scrollTo(
-      index: ayahNumber - 1 + _headerCount,
+      index: index,
       duration: const Duration(milliseconds: 400),
       curve: Curves.easeInOut,
     );
@@ -320,7 +340,9 @@ class _ReaderScreenState extends State<ReaderScreen> {
             ),
             const SizedBox(width: 12),
             Text(hasCurrent
-                ? 'Ayah $_playingAyah / ${_ayahs.length}'
+                ? (_inBismillah
+                    ? 'Bismillah'
+                    : 'Ayah $_playingAyah / ${_ayahs.length}')
                 : 'Tap play to listen'),
           ],
         ),
@@ -354,22 +376,25 @@ class _ReaderScreenState extends State<ReaderScreen> {
                       _bismillah,
                       textAlign: TextAlign.center,
                       textDirection: TextDirection.rtl,
-                      style: const TextStyle(fontSize: 28),
+                      style: TextStyle(
+                        fontSize: 28,
+                        color: _inBismillah ? Colors.green : null,
+                      ),
                     ),
                   );
                 }
 
                 final a = _ayahs[i - _headerCount];
                 final isMarked = _bookmarked.contains(a.ayahNumber);
-                final isPlayingThis = _playingAyah == a.ayahNumber;
+                final isPlayingThis =
+                    _playingAyah == a.ayahNumber && !_inBismillah;
                 return Card(
                   color: isPlayingThis ? Colors.green.shade50 : null,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                     side: BorderSide(
-                      color: isPlayingThis
-                          ? Colors.green
-                          : Colors.transparent,
+                      color:
+                          isPlayingThis ? Colors.green : Colors.transparent,
                       width: 1.5,
                     ),
                   ),

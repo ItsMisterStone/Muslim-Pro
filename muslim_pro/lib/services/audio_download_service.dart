@@ -30,29 +30,49 @@ class AudioDownloadService {
 
   String _code(int n) => n.toString().padLeft(3, '0');
 
-  Future<Directory> _surahDir(int surah) async {
+  /// Surah 1 has the bismillah as its ayah 1, surah 9 has none.
+  bool needsBismillah(int surah) => surah != 1 && surah != 9;
+
+  Future<Directory> _reciterDir() async {
     final base = await getApplicationDocumentsDirectory();
-    final dir =
-        Directory(p.join(base.path, 'audio', reciterFolder, _code(surah)));
+    final dir = Directory(p.join(base.path, 'audio', reciterFolder));
     if (!await dir.exists()) await dir.create(recursive: true);
     return dir;
   }
 
-  /// Where a given ayah's audio file lives (used by the player in Step 7).
+  Future<Directory> _surahDir(int surah) async {
+    final reciter = await _reciterDir();
+    final dir = Directory(p.join(reciter.path, _code(surah)));
+    if (!await dir.exists()) await dir.create(recursive: true);
+    return dir;
+  }
+
+  /// Where a given ayah's audio file lives.
   Future<File> ayahFile(int surah, int ayah) async {
     final dir = await _surahDir(surah);
     return File(p.join(dir.path, '${_code(ayah)}.mp3'));
   }
 
-  /// True only when every ayah of the surah has been fully downloaded.
+  /// The shared bismillah recording, used by every surah except 1 and 9.
+  /// It lives outside the surah folders, so deleting a surah keeps it.
+  Future<File> bismillahFile() async {
+    final dir = await _reciterDir();
+    return File(p.join(dir.path, 'bismillah.mp3'));
+  }
+
+  /// True only when every ayah (and the bismillah, if needed) is on disk.
   Future<bool> isDownloaded(Surah s) async {
     final dir = await _surahDir(s.number);
     final count =
         await dir.list().where((f) => f.path.endsWith('.mp3')).length;
-    return count >= s.ayahCount;
+    if (count < s.ayahCount) return false;
+    if (needsBismillah(s.number) && !await (await bismillahFile()).exists()) {
+      return false;
+    }
+    return true;
   }
 
-  /// Downloads all missing ayahs. Throws on failure (use friendlyError).
+  /// Downloads everything missing. Throws on failure (use friendlyError).
   Future<void> downloadSurah(Surah s) async {
     if (isDownloading(s.number)) return;
 
@@ -62,6 +82,10 @@ class AudioDownloadService {
     notifier.value = 0;
 
     try {
+      if (needsBismillah(s.number)) {
+        await _ensureBismillah(token);
+      }
+
       var done = 0;
       final missing = <int>[];
       for (var a = 1; a <= s.ayahCount; a++) {
@@ -94,6 +118,16 @@ class AudioDownloadService {
       notifier.value = null;
       _tokens.remove(s.number);
     }
+  }
+
+  Future<void> _ensureBismillah(CancelToken token) async {
+    final file = await bismillahFile();
+    if (await file.exists()) return;
+    final temp = File('${file.path}.part');
+    // Al-Fatiha ayah 1 IS the bismillah, recited by the same reciter.
+    final url = '$_baseUrl/$reciterFolder/001001.mp3';
+    await _dio.download(url, temp.path, cancelToken: token);
+    await temp.rename(file.path);
   }
 
   Future<void> _downloadAyah(int surah, int ayah, CancelToken token) async {
