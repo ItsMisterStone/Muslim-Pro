@@ -46,6 +46,7 @@ class DashboardScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            
             // --- Prayer Times Button ---
             ElevatedButton.icon(
               onPressed: () {
@@ -68,6 +69,31 @@ class DashboardScreen extends StatelessWidget {
               ),
             ),
 
+            const SizedBox(height: 20),
+            
+            // --- Masjid & Jamaat Timings Button ---
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const MasjidTimingsScreen()),
+                );
+              },
+              icon: const Icon(Icons.mosque, size: 28),
+              label: const Text(
+                'Masjid & Jamaat Timings',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                backgroundColor: Colors.green.shade50,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+              ),
+            ),
+            
             const SizedBox(height: 20),
 
             // --- Combined Daily Zikr Button (Morning + Evening) ---
