@@ -1,0 +1,5 @@
+-User needs to be able to choose their preferred prayer timings
+-User should get notifications
+-User should be able to choose their preferred reciter
+-Improve the qibla text
+-Change how the Jamaat/Masjid timings system works

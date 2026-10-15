@@ -1,165 +1,135 @@
 # Muslim Pro
 
-Android Muslim app built with Flutter (CSE299, Group 5). Local-only: no backend, no accounts.
+A Flutter app for Muslim daily essentials (prayer times, Qibla, Daily Zikr, Quran, Masjid timings). This README covers only how to get the project running for development.
 
-- Package ID: `com.group5.muslim_pro`
-- Platform: **Android only** (Windows/online features are out of scope for now)
-- Flutter project lives in the `muslim_pro/` subfolder
+## 1. Prerequisites
 
-## Current features
+Install the following:
 
-- Prayer times from GPS location (offline, via `adhan_dart`)
-- Local SQLite database (sqflite) with CRUD for `tasbeeh_counters`
+1. **Git**: https://git-scm.com/downloads
+2. **Flutter SDK** (stable channel): https://docs.flutter.dev/get-started/install
+   - The project needs Dart `^3.13.4` (see `pubspec.yaml`). Run `flutter upgrade` if your version is older.
+3. **Android Studio**: https://developer.android.com/studio
+   - During setup, install the **Android SDK**, **Android SDK Command-line Tools**, and **Android Emulator**.
+   - Install the **Flutter** and **Dart** plugins (Settings > Plugins).
+4. **An editor** (optional): VS Code with the Flutter extension, or Android Studio itself.
 
-## Requirements
+Accept the Android licenses:
 
-| Tool | Version / note |
-|---|---|
-| Flutter SDK | 3.47.5 (stable) |
-| Android Studio | With Android SDK installed |
-| Android NDK | 28.2.13676358 |
-| Git | Any recent version |
-| Phone | Android with USB debugging on (or an emulator) |
-
-## Setup
-
-### 1. Install Flutter
-
-1. Download the Flutter SDK (stable) and extract it somewhere with **no spaces** in the path, e.g. `C:\dev\flutter`.
-2. Add `<flutter>\bin` to your PATH.
-3. Restart the terminal and run:
-
-```powershell
-flutter --version
-```
-
-### 2. Install Android tooling
-
-1. Install Android Studio.
-2. Open **Settings > Languages & Frameworks > Android SDK**.
-3. **SDK Platforms** tab: install a recent Android API level.
-4. **SDK Tools** tab: tick **Show Package Details** on Android NDK (Side by side) and install **28.2.13676358**. Also install **Android SDK Command-line Tools**.
-5. Accept licenses:
-
-```powershell
+```bash
 flutter doctor --android-licenses
 ```
 
-> Install the NDK from Android Studio's SDK Manager, not from the command line. The old `sdkmanager` crashes.
+Verify everything is set up:
 
-### 3. Verify
-
-```powershell
+```bash
 flutter doctor
 ```
 
-The Flutter and Android toolchain rows should be green. Visual Studio / Chrome warnings can be ignored (Android only).
+Fix anything marked with a red cross before continuing. (Xcode/Chrome/Visual Studio warnings can be ignored, see "Supported platforms" below.)
 
-### 4. Clone and install dependencies
+## 2. Get the code
 
-```powershell
-git clone <REPO_URL>
-cd <REPO_FOLDER>\muslim_pro
+```bash
+git clone https://github.com/ItsMisterStone/Muslim-Pro.git
+cd Muslim-Pro/muslim_pro
+git checkout main
+```
+
+All Flutter commands below must be run from the `muslim_pro/` folder (the one containing `pubspec.yaml`).
+
+## 3. Install dependencies
+
+```bash
 flutter pub get
 ```
 
-### 5. Connect a phone
+Run this again any time `pubspec.yaml` changes (for example after pulling or merging).
 
-1. On the phone: **Settings > About phone**, tap **Build number** 7 times to enable Developer options.
-2. **Developer options > USB debugging**: on.
-3. Plug in via USB and accept the "Allow USB debugging" prompt.
-4. Check it is detected:
+## 4. Set up a device
 
-```powershell
+**Option A: Android emulator**
+
+1. Android Studio > Device Manager > Create Device.
+2. Pick a phone (e.g. Pixel 7) and a system image (API 33 or higher), then finish.
+3. Start the emulator.
+4. In the emulator's Extended Controls (`...` button) > Location, set a location. Prayer Times, Qibla and Masjid Timings need GPS.
+
+**Option B: Physical Android phone (recommended for Qibla)**
+
+1. Enable Developer options: Settings > About phone > tap **Build number** 7 times.
+2. Enable **USB debugging** in Developer options.
+3. Connect via USB and accept the debugging prompt on the phone.
+4. Turn on **Location** on the phone.
+
+Confirm Flutter sees the device:
+
+```bash
 flutter devices
 ```
 
-### 6. Run
+## 5. Run the app
 
-From inside `muslim_pro/`:
-
-```powershell
+```bash
 flutter run
 ```
 
-The first build takes several minutes. On first launch, allow the **location permission** popup and make sure the phone's GPS/location toggle is on.
+If more than one device is connected, pick one:
 
-Useful keys while running: `r` hot reload, `R` full restart, `q` quit.
-
-## Project structure
-
-```
-muslim_pro/
-├── lib/
-│   ├── main.dart
-│   ├── screens/     # Full pages (prayer_times_screen.dart)
-│   ├── widgets/     # Reusable UI pieces
-│   ├── models/      # Data classes (tasbeeh_counter.dart)
-│   ├── services/    # location_service.dart, prayer_time_service.dart
-│   └── db/          # database_helper.dart, tasbeeh_queries.dart
-├── assets/
-├── android/
-└── pubspec.yaml
+```bash
+flutter run -d <device-id>
 ```
 
-## Dependencies
+While running, press `r` for hot reload, `R` for hot restart, `q` to quit.
 
-| Package | Used for |
-|---|---|
-| `sqflite`, `path`, `path_provider` | Local SQLite database |
-| `adhan_dart` | Offline prayer time calculation |
-| `geolocator` | GPS location + permission handling |
-| `intl` | Date/time formatting |
+When prompted by the app, allow **location permission**.
 
-Add new packages with `flutter pub add <name>` (not by hand-editing `pubspec.yaml`), then commit `pubspec.yaml` and `pubspec.lock`.
+## Supported platforms
 
-## Database
+- **Android: supported.** Use this for development.
+- **Windows / macOS / Linux / Web: not supported.** The app uses `sqflite`, which does not work on desktop or web without extra setup.
+- **iOS:** requires a Mac with Xcode, and location usage descriptions in `Info.plist`. Not set up for this guide.
 
-- File: `muslim_pro.db` (on the device, in the app's databases folder)
-- Access it only through `DatabaseHelper.instance.database`
-- Schema is versioned (`_dbVersion` in `database_helper.dart`)
-
-### Changing the schema
-
-1. Bump `_dbVersion`.
-2. Add the change to `_onUpgrade` (e.g. `ALTER TABLE ... ADD COLUMN ...`) and, for new tables, to `_onCreate` too.
-3. **During development**, if the app crashes or shows old schema after a change, uninstall the app from your phone (or clear its storage) and run again. This wipes the DB and re-runs `onCreate`.
-
-## Prayer time settings
-
-Configured in `lib/services/prayer_time_service.dart`:
-
-- Calculation method: Karachi
-- Asr: Hanafi
-
-Times can differ by 1-3 minutes from local mosque timetables.
-
-## Git workflow
-
-- Default branch: `main`
-- Pull before you start working: `git pull`
-- Work on a branch for anything bigger than a small fix:
-
-```powershell
-git checkout -b feature/<name>
-git add <files>
-git commit -m "Short description"
-git push -u origin feature/<name>
-```
-
-- Don't commit build output (`build/`, `.dart_tool/`); `.gitignore` already covers these.
+The Qibla compass relies on the device's magnetometer. It will not work properly on an emulator, so test it on a real phone.
 
 ## Troubleshooting
 
-| Problem | Fix |
+**`flutter pub get` fails or packages are missing**
+```bash
+flutter clean
+flutter pub get
+```
+
+**Build fails after pulling or merging**
+```bash
+flutter clean
+flutter pub get
+flutter analyze
+```
+Also search the code for leftover merge markers (`<<<<<<<`, `=======`, `>>>>>>>`), which break the build.
+
+**Gradle / Android build errors**
+- Open the `android/` folder in Android Studio and let Gradle sync, or run `flutter clean` and retry.
+- Make sure the Android SDK and command-line tools are installed (`flutter doctor`).
+
+**Database changes not showing (e.g. Masjid sample data)**
+Seed data only loads when a table is empty. To reset local data, uninstall the app from the device/emulator (or clear its storage), then run again.
+
+**Location not working**
+- Make sure device Location/GPS is on and permission was granted.
+- On an emulator, set a location in Extended Controls > Location.
+
+**No devices found**
+- Emulator: start it from Device Manager first.
+- Phone: re-plug the USB cable, re-accept the debugging prompt, and check `flutter devices`.
+
+## Useful commands
+
+| Command | Purpose |
 |---|---|
-| Windows blocks `dartaotruntime.exe` | Turn off **Smart App Control** (Windows Security > App & browser control) |
-| Build fails: NDK 28.2.13676358 not found | Install that exact NDK version via Android Studio SDK Manager |
-| `flutter devices` doesn't list the phone | Re-plug USB, re-accept the debugging prompt, set USB mode to File transfer |
-| "Location services are turned off" | Turn on GPS in the phone's quick settings |
-| "Location permission is permanently denied" | Phone Settings > Apps > Muslim Pro > Permissions > Location > Allow |
-| No location popup / location always fails | Check the two `ACCESS_*_LOCATION` permissions exist in `android/app/src/main/AndroidManifest.xml` |
-| Prayer times off by ~6 hours | Times must be converted with `.toLocal()` in `prayer_time_service.dart` |
-| Red line under `MyApp` in `test/widget_test.dart` | Default Flutter test; ignore or delete it once real tests exist |
-| Weird dependency errors after pulling | `flutter pub get`, then `flutter clean` and run again |
-| DB schema mismatch after pulling | Uninstall the app from the phone and re-run |
+| `flutter doctor` | Check your setup |
+| `flutter pub get` | Install dependencies |
+| `flutter analyze` | Static analysis (catches missing imports/classes) |
+| `flutter run` | Run the app |
+| `flutter clean` | Clear build cache |
+| `flutter devices` | List connected devices |
