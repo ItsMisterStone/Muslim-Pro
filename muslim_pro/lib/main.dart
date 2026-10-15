@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'screens/prayer_times_screen.dart';
-import 'screens/morning_athkar_screen.dart';
+import 'screens/athkar_selection_screen.dart';
 import 'screens/qibla_screen.dart';
 import 'screens/masjid_timings_screen.dart';
+import 'screens/quran_screen.dart';
 
-
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -27,7 +28,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// A new Dashboard screen acting as your "Front Page"
+// Dashboard screen acting as the "Front Page"
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
 
@@ -43,14 +44,15 @@ class DashboardScreen extends StatelessWidget {
         padding: const EdgeInsets.all(20.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch, // Makes buttons fill the width
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // --- Prayer Times Button ---
             ElevatedButton.icon(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const PrayerTimesScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => const PrayerTimesScreen()),
                 );
               },
               icon: const Icon(Icons.access_time, size: 28),
@@ -66,24 +68,25 @@ class DashboardScreen extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 20), // Spacing between buttons
+            const SizedBox(height: 20),
 
-            // --- Morning Zikr Button ---
+            // --- Combined Daily Zikr Button (Morning + Evening) ---
             ElevatedButton.icon(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const MorningAthkarScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => const AthkarSelectionScreen()),
                 );
               },
-              icon: const Icon(Icons.wb_sunny_outlined, size: 28),
+              icon: const Icon(Icons.wb_twilight, size: 28),
               label: const Text(
-                'Morning Zikr',
+                'Daily Zikr',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 20),
-                backgroundColor: Colors.teal.shade50, // Optional: slightly different color
+                backgroundColor: Colors.teal.shade50,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15),
                 ),
@@ -116,22 +119,22 @@ class DashboardScreen extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // --- Masjid & Jamaat Timings Button (NEW) ---
+            // --- Quran Button ---
             ElevatedButton.icon(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const MasjidTimingsScreen()),
+                  MaterialPageRoute(builder: (context) => const QuranScreen()),
                 );
               },
-              icon: const Icon(Icons.mosque, size: 28),
+              icon: const Icon(Icons.menu_book, size: 28),
               label: const Text(
-                'Masjid & Jamaat Timings',
+                'Quran',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 20),
-                backgroundColor: Colors.green.shade50,
+                backgroundColor: Colors.lightGreen.shade100,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15),
                 ),
