@@ -58,7 +58,7 @@ class _MasjidTimingsScreenState extends State<MasjidTimingsScreen> {
 
       // 3. Calculate Offline Base Prayer Times (Karachi + Hanafi)
       final coordinates = Coordinates(position.latitude, position.longitude);
-      final params = CalculationMethod.karachi();
+      final params = CalculationMethodParameters.karachi();
       params.madhab = Madhab.hanafi;
 
       final prayerTimes = PrayerTimes(
